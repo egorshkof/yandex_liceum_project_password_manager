@@ -102,6 +102,8 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
     def edit_entry(self):
         """Open form for editing current service"""
         selected_items = self.passwordTable.selectedItems()
+        if not selected_items:
+            return
 
         row = selected_items[0].row()
         current_service = self.passwordTable.item(row, 0).text()
@@ -258,7 +260,7 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
         self.passwordTable.addAction(action)
 
     def open_github(self):
-        webbrowser.open("https://github.com/egorshkof")
+        webbrowser.open("https://github.com/egorshkof/yandex_liceum_project_password_manager")
 
     def show_about(self):
         QMessageBox.about(self, "О программе",
@@ -327,3 +329,4 @@ if __name__ == '__main__':
     ex = PasswordManager()
     ex.show()
     sys.exit(app.exec())
+
