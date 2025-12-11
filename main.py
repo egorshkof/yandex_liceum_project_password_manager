@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMessageBox, QFileDialog
+from PyQt6.QtWidgets import QMessageBox, QFileDialog, QLineEdit
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtWidgets import QHeaderView, QDialogButtonBox
@@ -31,6 +31,9 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
         # / searching /
         self.searchButton.clicked.connect(self.search)
         self.passwordTable.itemSelectionChanged.connect(self.show_selected_password)
+        # / show password /
+        self.showButton.clicked.connect(self.toggle_password_visibility)
+        self.passwordEdit.setEchoMode(QLineEdit.EchoMode.Password)
         # / table /
         self.passwordTable.setColumnCount(2)
         self.passwordTable.setHorizontalHeaderLabels(['Service', 'URL'])
@@ -91,6 +94,14 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
             self.URLedit.setText(url)
             self.loginEdit.setText(login)
             self.passwordEdit.setText(password)
+            self.passwordEdit.setEchoMode(QLineEdit.EchoMode.Password)
+
+    def toggle_password_visibility(self):
+        """Toggle password visibility"""
+        if self.passwordEdit.echoMode() == QLineEdit.EchoMode.Password:
+            self.passwordEdit.setEchoMode(QLineEdit.EchoMode.Normal)
+        else:
+            self.passwordEdit.setEchoMode(QLineEdit.EchoMode.Password)
 
     def add_entry(self):
         """Open form for adding new service"""
