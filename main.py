@@ -1,15 +1,17 @@
-import webbrowser
-import sqlite3
-import sys
-import csv
-
 from PyQt6.QtWidgets import QMessageBox, QFileDialog
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtWidgets import QHeaderView, QDialogButtonBox
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QAction
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence
 from manager import Ui_MainWindow
 from form import Ui_Form
+
+import webbrowser
+import sqlite3
+import sys
+import csv
 
 
 class PasswordManager(QMainWindow, Ui_MainWindow):
@@ -42,6 +44,11 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
         self.actionAbout.triggered.connect(self.show_about)
         self.actionHotkeys.triggered.connect(self.show_hotkeys)
         self.actionGitHub.triggered.connect(self.open_github)
+        # / hotkeys /
+        self.addButton.setShortcut(QKeySequence("Ctrl+N"))
+        self.editButton.setShortcut(QKeySequence("Ctrl+E"))
+        self.deleteButton.setShortcut(QKeySequence("Delete"))
+        self.open_url_action()
         # / database /
         self.db_path = 'passwords.db'
         self.con = sqlite3.connect(self.db_path)
@@ -242,6 +249,13 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
                                 "<b>Ctrl + E</b> — Редактировать<br>"
                                 "<b>Del</b> — Удалить выделенную<br>"
                                 "<b>Enter</b> — Открыть URL")
+
+    def open_url_action(self):
+        """Enter - open URL"""
+        action = QAction(self.passwordTable)
+        action.setShortcut(Qt.Key.Key_Enter)
+        action.triggered.connect(self.open_url)
+        self.passwordTable.addAction(action)
 
     def open_github(self):
         webbrowser.open("https://github.com/egorshkof")
