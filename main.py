@@ -19,7 +19,7 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('Password manager')
-        self.setWindowIcon(QIcon('icon.ico'))
+        self.setWindowIcon(QIcon('dist/icon.ico'))
         # / open / copy /
         self.open_url_button.clicked.connect(self.open_url)
         self.copyButton_login.clicked.connect(self.copy_login)
@@ -56,10 +56,18 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
         self.db_path = 'passwords.db'
         self.con = sqlite3.connect(self.db_path)
         self.cur = self.con.cursor()
+        self.cur.execute("""
+        CREATE TABLE IF NOT EXISTS passwords (
+            service TEXT,
+            url TEXT,
+            login TEXT,
+            password TEXT
+        )
+        """)
+        self.con.commit()
 
     def search(self):
         """Searching in database"""
-        self.passwordTable.setRowCount(0)
         search_text = self.searchLineEdit.text()
         result = self.cur.execute("""SELECT service, url 
                                      FROM passwords""").fetchall()
@@ -70,6 +78,7 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
 
     def update_table(self, data):
         """Update table with new data"""
+        self.passwordTable.setRowCount(0)
         for row_num, row_data in enumerate(data):
             self.passwordTable.insertRow(row_num)
             for col_num, elem in enumerate(row_data):
@@ -184,7 +193,7 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
 
     def export_to_csv(self):
         """Export all passwords to .csv file"""
-        path, _ = QFileDialog.getSaveFileName(self, "Сохранить как CSV",
+        path, _ = QFileDialog.getSaveFileName(self, "Save as CSV",
                                               "passwords_export.csv", "CSV Files (*.csv);;All Files (*)")
         if not path:
             return
@@ -257,11 +266,11 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
             QMessageBox.critical(self, "Import error", f"Failed to import data: \n\n{e}")
 
     def show_hotkeys(self):
-        QMessageBox.information(self, "Горячие клавиши",
-                                "<b>Ctrl + N</b> — Добавить запись<br>"
-                                "<b>Ctrl + E</b> — Редактировать<br>"
-                                "<b>Del</b> — Удалить выделенную<br>"
-                                "<b>Enter</b> — Открыть URL")
+        QMessageBox.information(self, "Hotkeys",
+                                "<b>Ctrl + N</b> — Add entry<br>"
+                                "<b>Ctrl + E</b> — Editing<br>"
+                                "<b>Del</b> — Delete selected entry<br>"
+                                "<b>Enter</b> — Open URL")
 
     def open_url_action(self):
         """Enter - open URL"""
@@ -274,19 +283,19 @@ class PasswordManager(QMainWindow, Ui_MainWindow):
         webbrowser.open("https://github.com/egorshkof/yandex_liceum_project_password_manager")
 
     def show_about(self):
-        QMessageBox.about(self, "О программе",
+        QMessageBox.about(self, "About program",
                           "<h2>Password Manager v1.0.0</h2>"
-                          "<p><b>Автор:</b> Егор</p>"
-                          "<p><b>Группа:</b> Д2 / Яндекс.Лицей</p>"
-                          "<p>Менеджер паролей на PyQt</p>"
-                          "<p>Особенности:</p>"
+                          "<p><b>Autor:</b> Egor</p>"
+                          "<p>Group<b>:</b> Д2 / Yandex.Liceum</p>"
+                          "<p>Password manager on PyQt</p>"
+                          "<p>Properties:</p>"
                           "<ul>"
-                          "<li>Добавление / редактирование / удаление записей</li>"
-                          "<li>Поиск и сортировка</li>"
-                          "<li>Импорт и экспорт в CSV</li>"
-                          "<li>Валидация полей</li>"
-                          "<li>Копирование в буфер</li>"
-                          "<li>Открытие ссылок</li>"
+                          "<li>Adding / editing / deleting entries</li>"
+                          "<li>Searching</li>"
+                          "<li>Import and export into CSV</li>"
+                          "<li>Fields validation</li>"
+                          "<li>Copying to clipboard</li>"
+                          "<li>Opening links</li>"
                           "</ul>")
 
     def open_url(self):
@@ -312,7 +321,7 @@ class InputForm(QDialog, Ui_Form):
     def __init__(self, *args):
         super().__init__()
         self.setupUi(self)
-        self.setWindowIcon(QIcon('icon.ico'))
+        self.setWindowIcon(QIcon('dist/icon.ico'))
         # / unpacking /
         name, service, url, login, password = args
         self.setWindowTitle(name)
